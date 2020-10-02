@@ -1,11 +1,9 @@
 package P6.Domein;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "adres")
 public class Adres {
     @Id
     @Column(name = "adres_id")
@@ -14,7 +12,9 @@ public class Adres {
     private String huisnummer;
     private String straat;
     private String woonplaats;
-    @Transient
+    @OneToOne(
+            mappedBy = "adres"
+    )
     private Reiziger reiziger;
 
     public Adres(int id, String postcode, String huisnummer, String straat, String woonplaats, Reiziger reiziger) {

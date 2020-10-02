@@ -1,24 +1,31 @@
 package P6.Domein;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table (name = "ov_chipkaart")
 public class OVChipkaart {
     @Id
     @Column (name = "kaart_nummer")
     private int kaartNummer;
+    @Column (name = "geldig_tot")
     private Date geldigTot;
     private int klasse;
     private float saldo;
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "reiziger_id", nullable = false)
     private Reiziger reiziger;
-    @Transient
-    private ArrayList<Product> producten = new ArrayList<Product>();
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "ov_chipkaart_product",
+            joinColumns = { @JoinColumn(name = "kaart_nummer")},
+            inverseJoinColumns = { @JoinColumn(name = "product_nummer")}
+    )
+    private Set<Product> producten = new HashSet<>();
 
     public static ArrayList<OVChipkaart> alleOvChipkaarten = new ArrayList<>();
 
@@ -76,9 +83,9 @@ public class OVChipkaart {
         this.reiziger = reiziger;
     }
 
-    public ArrayList<Product> getProducten() {return producten;}
+    public Set<Product> getProducten() {return producten;}
 
-    public void setProducten(ArrayList<Product> producten) {
+    public void setProducten(Set<Product> producten) {
         this.producten = producten;
     }
 

@@ -1,14 +1,12 @@
 package P6.Domein;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-import java.util.ArrayList;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 
 @Entity
+@Table(name = "reiziger")
 public class Reiziger {
     @Id
     @Column(name = "reiziger_id")
@@ -17,10 +15,16 @@ public class Reiziger {
     private String tussenvoegsel;
     private String achternaam;
     private Date geboortedatum;
-    @Transient
-    private Adres adres = null;
-    @Transient
-    private ArrayList<OVChipkaart> OVChipkaarten = new ArrayList<>();
+    @OneToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "reiziger_id"
+    )
+    private Adres adres;
+
+    @OneToMany(mappedBy = "reiziger")
+    private Set<OVChipkaart> OVChipkaarten;
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum) {
         this.id = id;
@@ -30,6 +34,18 @@ public class Reiziger {
         this.geboortedatum = geboortedatum;
     }
     public Reiziger(){}
+
+    public void addAdres(Adres adres){
+        adres.setReiziger(this);
+        this.adres = adres;
+    }
+
+    public void removeAdres(){
+        if(adres!=null){
+            adres.setReiziger(null);
+            this.adres = null;
+        }
+    }
 
     public int getId() {
         return id;
@@ -79,11 +95,11 @@ public class Reiziger {
         this.adres = adres;
     }
 
-    public ArrayList<OVChipkaart> getOVChipkaarten() {
+    public Set<OVChipkaart> getOVChipkaarten() {
         return OVChipkaarten;
     }
 
-    public void setOVChipkaarten(ArrayList<OVChipkaart> OVChipkaarten) {
+    public void setOVChipkaarten(Set<OVChipkaart> OVChipkaarten) {
         this.OVChipkaarten = OVChipkaarten;
     }
 

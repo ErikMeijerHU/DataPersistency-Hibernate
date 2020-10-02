@@ -1,10 +1,9 @@
 package P6.Domein;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Product {
@@ -14,9 +13,8 @@ public class Product {
     private String naam;
     private String beschrijving;
     private float prijs;
-    // Ik gebruik hier een list van ID's in plaats van de objecten zelf om looping te voorkomen
-    @Transient
-    private ArrayList<Integer> ovChipkaartenIds = new ArrayList<>();
+    @ManyToMany(mappedBy = "producten")
+    private Set<OVChipkaart> ovChipkaarten = new HashSet<>();
 
     public static ArrayList<Product> alleProducten = new ArrayList<>();
 
@@ -65,22 +63,22 @@ public class Product {
         this.prijs = prijs;
     }
 
-    public ArrayList<Integer> getOvChipkaarten() {
-        return ovChipkaartenIds;
+    public Set<OVChipkaart> getOvChipkaarten() {
+        return ovChipkaarten;
     }
 
     public void setOvChipkaarten(ArrayList<OVChipkaart> ovChipkaarten) {
-        ovChipkaartenIds.clear();
+        this.ovChipkaarten.clear();
         for (OVChipkaart ovChipkaart : ovChipkaarten){
-            if (!ovChipkaartenIds.contains(ovChipkaart.getKaartNummer())){
-                ovChipkaartenIds.add(ovChipkaart.getKaartNummer());
+            if (!this.ovChipkaarten.contains(ovChipkaart)){
+                this.ovChipkaarten.add(ovChipkaart);
             }
         }
     }
 
     public Boolean addOvChipkaart(OVChipkaart ovChipkaart){
-        if (!ovChipkaartenIds.contains(ovChipkaart.getKaartNummer())) {
-            this.ovChipkaartenIds.add(ovChipkaart.getKaartNummer());
+        if (!ovChipkaarten.contains(ovChipkaart)) {
+            this.ovChipkaarten.add(ovChipkaart);
             return true;
         }
         return false;
@@ -99,8 +97,8 @@ public class Product {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("Product{" + "Nummer = ").append(productNummer).append(", Naam = '").append(naam).append('\'').append(", Beschrijving = '").append(beschrijving).append('\'').append(", Prijs = ").append(prijs).append(", Chipkaarten = [");
-        for (int i : ovChipkaartenIds){
-            OVChipkaart chipkaart = OVChipkaart.findById(i);
+        for (OVChipkaart ovChipkaart : ovChipkaarten){
+            OVChipkaart chipkaart = ovChipkaart;
             s.append("{ID: " + chipkaart.getKaartNummer() + ", Geldig Tot: " + chipkaart.getGeldigTot() + ", Saldo: " + chipkaart.getSaldo() + ", Klasse: " + chipkaart.getKlasse() + "}");
         }
         s.append("]}");
